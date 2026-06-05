@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Threading;
+
 using Spectre.Console;
 
 namespace CalavHashScanner
@@ -168,7 +162,7 @@ namespace CalavHashScanner
             AnsiConsole.Progress()
                 .AutoClear(true)
                 .Columns(
-                    new Spectre.Console.ProgressBarColumn(),
+                    new ProgressBarColumn(),
                     new PercentageColumn(),
                     new RemainingTimeColumn(),
                     new TaskDescriptionColumn())
@@ -213,9 +207,11 @@ namespace CalavHashScanner
 
             if (threats > 0)
             {
-                AnsiConsole.MarkupLine("\n[bold red]Threat file paths:[/]");
+                AnsiConsole.MarkupLine("\n[bold red] !!!! THREATS FOUND !!!![/]");
+                AnsiConsole.MarkupLine("[yellow]Please review the following file paths for potential threats:[/]");
+
                 foreach (var t in threatPaths)
-                    AnsiConsole.MarkupLine($" - [yellow]{t}[/]");
+                    AnsiConsole.MarkupLine($" - [bold red]{t}[/]");
             }
             else
             {
