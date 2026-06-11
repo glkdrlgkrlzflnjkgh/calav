@@ -35,6 +35,11 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -o ./publish
 
+      - name: Zip published output
+        run: |
+          cd publish
+          zip -r ../CalavScanner.zip .
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -49,6 +54,6 @@ jobs:
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
-          files: ./publish/**
+          files: CalavScanner.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
