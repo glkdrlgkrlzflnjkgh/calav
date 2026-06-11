@@ -3,10 +3,10 @@ name: Build and Release
 on:
   push:
     tags:
-      - "v*"   # Runs when you push a tag like v1.0.0
+      - "v*"
 
 permissions:
-  contents: write   # Needed to create releases
+  contents: write
   packages: write
   pull-requests: write
 
@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "9.0.x"
 
       - name: Restore
         run: dotnet restore
@@ -32,28 +32,45 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity normal
 
-      - name: Publish
-        run: dotnet publish -c Release -o ./publish
+      # -------------------------
+      # WINDOWS BUILD
+      # -------------------------
+      - name: Publish Windows (win-x64)
+        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish-win
 
-      - name: Zip published output
+      - name: Zip Windows build
         run: |
-          cd publish
-          zip -r ../CalavScanner.zip .
+          cd publish-win
+          zip -r ../CalavScanner-win-x64.zip .
 
+      # -------------------------
+      # LINUX BUILD
+      # -------------------------
+      - name: Publish Linux (linux-x64)
+        run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish-linux
+
+      - name: Zip Linux build
+        run: |
+          cd publish-linux
+          zip -r ../CalavScanner-linux-x64.zip .
+
+      # -------------------------
+      # RELEASE CREATION
+      # -------------------------
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Release Asset
+      - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
-          files: CalavScanner.zip
+          files: |
+            CalavScanner-win-x64.zip
+            CalavScanner-linux-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
