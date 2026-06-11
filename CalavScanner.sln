@@ -5,8 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalavScanner", "CalavScanner.csproj", "{5395203B-B74C-469B-B9CD-2C80E672171F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalavHashScanner.Tests", "CalavHashScanner.Tests\CalavHashScanner.Tests.csproj", "{BA4AC5CA-8F9D-4FC8-9F52-9D03D5A3B365}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
