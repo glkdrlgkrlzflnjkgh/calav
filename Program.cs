@@ -203,9 +203,9 @@ namespace CalavHashScanner
                                     }
                                 }
                             }
-                            catch
+                            catch (Exception ex)
                             {
-                                AnsiConsole.MarkupLine($"[red]Error processing file:[/] {file}");
+                                AnsiConsole.MarkupLine($"[red]Error processing file:[/] {file} Exception: {ex.Message}");
                                 return;
                             }
                             finally
