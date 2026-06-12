@@ -32,7 +32,7 @@ namespace CalavHashScanner
             {
                 if (arg == "--stats" || arg == "-s")
                 {
-                    AnsiConsole.MarkupLine($"[cyan]Days since first commit:[/] [green]{daysSince}[/]");
+                    AnsiConsole.MarkupLine($"[cyan]CalAV has been fighting threats for:[/] [green]{daysSince}[/][cyan] days![/]");
                     return;
                 }
             }
