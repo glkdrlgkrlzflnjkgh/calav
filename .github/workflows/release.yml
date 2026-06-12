@@ -12,7 +12,12 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout
@@ -33,30 +38,45 @@ jobs:
         run: dotnet test --configuration Release --no-build --verbosity normal
 
       # -------------------------
-      # WINDOWS BUILD
+      # OS-SPECIFIC PUBLISH
       # -------------------------
-      - name: Publish Windows (win-x64)
-        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish-win
-
-      - name: Zip Windows build
+      - name: Publish
         run: |
-          cd publish-win
-          zip -r ../CalavScanner-win-x64.zip .
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+          else
+            dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+          fi
 
-      # -------------------------
-      # LINUX BUILD
-      # -------------------------
-      - name: Publish Linux (linux-x64)
-        run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish-linux
-
-      - name: Zip Linux build
+      - name: Zip output
         run: |
-          cd publish-linux
-          zip -r ../CalavScanner-linux-x64.zip .
+          cd publish
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            zip -r ../CalavScanner-linux-x64.zip .
+          else
+            powershell Compress-Archive -Path * -DestinationPath ../CalavScanner-win-x64.zip
+          fi
 
-      # -------------------------
-      # RELEASE CREATION
-      # -------------------------
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-artifact
+          path: |
+            CalavScanner-linux-x64.zip
+            CalavScanner-win-x64.zip
+          if-no-files-found: ignore
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -70,7 +90,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            CalavScanner-win-x64.zip
-            CalavScanner-linux-x64.zip
+            artifacts/**/CalavScanner-linux-x64.zip
+            artifacts/**/CalavScanner-win-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
