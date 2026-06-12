@@ -45,7 +45,6 @@ jobs:
         run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
 
       - name: Zip Linux build
-        shell: bash
         if: matrix.os == 'ubuntu-latest'
         run: |
           cd publish
@@ -74,6 +73,7 @@ jobs:
         with:
           name: linux-x64-artifact
           path: CalavScanner-linux-x64.zip
+          if-no-files-found: error
 
       - name: Upload Windows artifact
         if: matrix.os == 'windows-latest'
@@ -81,6 +81,7 @@ jobs:
         with:
           name: windows-x64-artifact
           path: CalavScanner-win-x64.zip
+          if-no-files-found: error
 
   release:
     name: Create Release
