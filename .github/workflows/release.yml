@@ -38,33 +38,48 @@ jobs:
         run: dotnet test --configuration Release --no-build --verbosity normal
 
       # -------------------------
-      # OS-SPECIFIC PUBLISH
+      # LINUX PUBLISH + ZIP
       # -------------------------
-      - name: Publish
-        run: |
-          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-            dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
-          else
-            dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
-          fi
+      - name: Publish Linux (linux-x64)
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
 
-      - name: Zip output
+      - name: Zip Linux build
+        if: matrix.os == 'ubuntu-latest'
         run: |
           cd publish
-          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-            zip -r ../CalavScanner-linux-x64.zip .
-          else
-            powershell Compress-Archive -Path * -DestinationPath ../CalavScanner-win-x64.zip
-          fi
+          zip -r ../CalavScanner-linux-x64.zip .
 
-      - name: Upload artifact
+      # -------------------------
+      # WINDOWS PUBLISH + ZIP
+      # -------------------------
+      - name: Publish Windows (win-x64)
+        if: matrix.os == 'windows-latest'
+        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
+
+      - name: Zip Windows build
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Set-Location publish
+          Compress-Archive -Path * -DestinationPath ../CalavScanner-win-x64.zip
+
+      # -------------------------
+      # UPLOAD ARTIFACTS
+      # -------------------------
+      - name: Upload Linux artifact
+        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-artifact
-          path: |
-            CalavScanner-linux-x64.zip
-            CalavScanner-win-x64.zip
-          if-no-files-found: ignore
+          name: linux-x64-artifact
+          path: CalavScanner-linux-x64.zip
+
+      - name: Upload Windows artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64-artifact
+          path: CalavScanner-win-x64.zip
 
   release:
     name: Create Release
