@@ -45,6 +45,7 @@ jobs:
         run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./publish
 
       - name: Zip Linux build
+        shell: bash
         if: matrix.os == 'ubuntu-latest'
         run: |
           cd publish
