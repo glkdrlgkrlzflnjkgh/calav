@@ -212,10 +212,12 @@ namespace CalavHashScanner
 
                 foreach (var t in threatPaths)
                     AnsiConsole.MarkupLine($" - [bold red]{t}[/]");
+                AnsiConsole.MarkupLine("\n[red]Please take appropriate action to investigate and mitigate these threats![/]");
+                AnsiConsole.MarkupLine("[red]Note that these may be false positives.[/]");
             }
             else
             {
-                AnsiConsole.MarkupLine("[green]No known threats detected.[/]");
+                AnsiConsole.MarkupLine("[green]No known threats detected! :)[/]");
             }
         }
 
