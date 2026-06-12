@@ -13,6 +13,13 @@ namespace CalavHashScanner
 
         static async Task Main(string[] args)
         {
+            DateTime firstCommit = new DateTime(2026, 6, 5);
+            DateTime today = DateTime.Today;
+
+            TimeSpan difference = today - firstCommit;
+
+            int daysSince = difference.Days;
+            
             AnsiConsole.MarkupLine("[bold cyan]=== Calav Hash Scanner ===[/]");
             AnsiConsole.MarkupLine("Hash-based, cache-aware, multithreaded scanner.\n");
 
@@ -20,6 +27,14 @@ namespace CalavHashScanner
             {
                 AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
                 return;
+            }
+            foreach (string arg in args)
+            {
+                if (arg == "--stats" || arg == "-s")
+                {
+                    AnsiConsole.MarkupLine($"[cyan]CalAV has been fighting threats for:[/] [green]{daysSince}[/][cyan] days![/]");
+                    return;
+                }
             }
 
             string directory = args[0];
