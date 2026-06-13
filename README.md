@@ -1,6 +1,6 @@
 # CalAV
 
-CalAV is a malware scanner written in c#,
+CalAV is a malware scanner written in c# and .NET,
 it scans for malwares based off of hashes.
 It is not realtime.
 
