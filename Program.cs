@@ -1,9 +1,10 @@
 ﻿// Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-
+using System.Timers;
 using Spectre.Console;
 
 namespace CalavHashScanner
@@ -155,9 +156,10 @@ namespace CalavHashScanner
 
             using var reader = new StreamReader(path, Encoding.UTF8);
             string? line;
+            Stopwatch Start = Stopwatch.StartNew();
             while ((line = reader.ReadLine()) != null)
             {
-                AnsiConsole.MarkupLine($"[blue]Reading line:[/] {line}");
+                
                 line = line.Trim();
                 if (string.IsNullOrEmpty(line)) continue;
                 if (line.StartsWith("#")) continue;
@@ -167,6 +169,9 @@ namespace CalavHashScanner
                 else
                     AnsiConsole.MarkupLine($"[yellow]Warning: Ignoring malformed line in hash list:[/] {line}");
             }
+            Start.Stop();
+            long elapsedMs = Start.ElapsedMilliseconds;
+            AnsiConsole.MarkupLine($"[green]Loaded {set.Count} known-bad hashes in {elapsedMs} ms.[/]");
 
             return set;
         }
