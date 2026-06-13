@@ -157,6 +157,7 @@ namespace CalavHashScanner
             string? line;
             while ((line = reader.ReadLine()) != null)
             {
+                AnsiConsole.MarkupLine($"[blue]Reading line:[/] {line}");
                 line = line.Trim();
                 if (string.IsNullOrEmpty(line)) continue;
                 if (line.StartsWith("#")) continue;
