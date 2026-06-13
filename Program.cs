@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿// Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
+
+
+using System.Security.Cryptography;
 using System.Text;
 
 using Spectre.Console;
