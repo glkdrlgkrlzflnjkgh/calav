@@ -11,6 +11,8 @@ namespace CalavHashScanner
 {
     class Program
     {
+
+        public static bool debugMode;
         // Remote hash list URL
         private const string HashListUrl =
             "https://raw.githubusercontent.com/romainmarcoux/malicious-hash/refs/heads/main/full-hash-sha256-aa.txt";
@@ -23,7 +25,7 @@ namespace CalavHashScanner
             TimeSpan difference = today - firstCommit;
 
             int daysSince = difference.Days;
-            
+
             AnsiConsole.MarkupLine("[bold cyan]=== Calav Hash Scanner ===[/]");
             AnsiConsole.MarkupLine("Hash-based, cache-aware, multithreaded scanner.\n");
 
@@ -32,15 +34,12 @@ namespace CalavHashScanner
                 AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
                 return;
             }
-            foreach (string arg in args)
-            {
-                if (arg == "--stats" || arg == "-s")
-                {
+            foreach (string arg in args) {
+                if (arg == "--stats" || arg == "-s") {
                     AnsiConsole.MarkupLine($"[cyan]CalAV has been fighting threats for:[/] [green]{daysSince}[/][cyan] days![/]");
                     return;
                 }
-                if (arg == "--help" || arg == "-h")
-                {
+                if (arg == "--help" || arg == "-h") {
                     AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
                     AnsiConsole.MarkupLine("[bold yellow]Options:[/]");
                     AnsiConsole.MarkupLine("  [green]-s, --stats[/]  Show the number of days since the first commit.");
@@ -48,11 +47,14 @@ namespace CalavHashScanner
                     AnsiConsole.MarkupLine("  [green]-l, --license[/] Show license information.");
                     return;
                 }
-                if (arg == "--license" || arg == "-l")
-                {
+                if (arg == "--license" || arg == "-l") {
                     AnsiConsole.MarkupLine("[bold yellow]Calav is licensed under the MIT License.[/]");
                     AnsiConsole.MarkupLine("See the LICENSE file in the project root (if compiled from source) or visit [blue]https://github.com/romainmarcoux/CalavScanner/blob/main/LICENSE[/] for full license information.");
                     return;
+                }
+                if (arg == "--debug" || arg == "-d") {
+                    AnsiConsole.MarkupLine("[bold cyan]DEBUG MODE ACTIVATED[/]");
+                    debugMode = true;
                 }
             }
 
@@ -93,7 +95,15 @@ namespace CalavHashScanner
 
         }
         // ---------- Cache management ----------
-
+        /// <summary>
+        /// Updates the hashlist from a remote URL.
+        /// All arguments are strings currently,
+        /// in future we could make the cached file a HashSet instead so we can simply load that data at bootup and reuse it.
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="cacheListPath"></param>
+        /// <param name="cacheHashPath"></param>
+        /// <returns></returns>
         private static async Task EnsureHashListUpToDateAsync(string url, string cacheListPath, string cacheHashPath)
         {
             using var client = new HttpClient();
@@ -130,7 +140,11 @@ namespace CalavHashScanner
 
             if (!string.Equals(storedHash, remoteHash, StringComparison.OrdinalIgnoreCase))
             {
-                AnsiConsole.MarkupLine("[yellow]Remote hash list has changed. Updating cache...[/]");
+                AnsiConsole.MarkupLine("[yellow]The remote hashlist has changed, updating cache...[/]");
+                if (debugMode) { 
+                    AnsiConsole.MarkupLine($"[bold yellow]The hash of the remote is: {remoteHash}[/]");
+                    AnsiConsole.MarkupLine($"[bold yellow]The hash of local hashlist is {storedHash}[/]");
+                }
                 File.WriteAllText(cacheListPath, remoteText, Encoding.UTF8);
                 File.WriteAllText(cacheHashPath, remoteHash, Encoding.UTF8);
                 AnsiConsole.MarkupLine("[green]Cache updated.[/]");
