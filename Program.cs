@@ -12,6 +12,10 @@ namespace CalavHashScanner
     class Program
     {
 
+
+
+
+
         public static bool debugMode;
         // Remote hash list URL
         private const string HashListUrl =
@@ -37,6 +41,9 @@ namespace CalavHashScanner
             foreach (string arg in args) {
                 if (arg == "--stats" || arg == "-s") {
                     AnsiConsole.MarkupLine($"[cyan]CalAV has been fighting threats for:[/] [green]{daysSince}[/][cyan] days![/]");
+                    if (DateTime.Now.Date == firstCommit) {
+                        AnsiConsole.MarkupLine("[bold yellow]Happy birthday, CalAV![/]");
+                    }
                     return;
                 }
                 if (arg == "--help" || arg == "-h") {
@@ -49,7 +56,7 @@ namespace CalavHashScanner
                 }
                 if (arg == "--license" || arg == "-l") {
                     AnsiConsole.MarkupLine("[bold yellow]Calav is licensed under the MIT License.[/]");
-                    AnsiConsole.MarkupLine("See the LICENSE file in the project root (if compiled from source) or visit [blue]https://github.com/romainmarcoux/CalavScanner/blob/main/LICENSE[/] for full license information.");
+                    AnsiConsole.MarkupLine("See the LICENSE file in the project root (if compiled from source) or visit [blue]https://github.com//CalavScanner/blob/main/LICENSE[/] for full license information.");
                     return;
                 }
                 if (arg == "--debug" || arg == "-d") {
