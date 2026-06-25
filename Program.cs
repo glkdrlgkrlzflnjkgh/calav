@@ -144,14 +144,14 @@ namespace CalavHashScanner
                 return;
             }
             string remoteHash = ComputeSha256String(remoteText);
-
+            if (debugMode) { 
+                    AnsiConsole.MarkupLine($"[bold yellow]The hash of the remote is: {remoteHash}[/]");
+                    AnsiConsole.MarkupLine($"[bold yellow]The hash of local hashlist is {storedHash}[/]");
+            }
             if (!string.Equals(storedHash, remoteHash, StringComparison.OrdinalIgnoreCase))
             {
                 AnsiConsole.MarkupLine("[yellow]The remote hashlist has changed, updating cache...[/]");
-                if (debugMode) { 
-                    AnsiConsole.MarkupLine($"[bold yellow]The hash of the remote is: {remoteHash}[/]");
-                    AnsiConsole.MarkupLine($"[bold yellow]The hash of local hashlist is {storedHash}[/]");
-                }
+
                 File.WriteAllText(cacheListPath, remoteText, Encoding.UTF8);
                 File.WriteAllText(cacheHashPath, remoteHash, Encoding.UTF8);
                 AnsiConsole.MarkupLine("[green]Cache updated.[/]");
