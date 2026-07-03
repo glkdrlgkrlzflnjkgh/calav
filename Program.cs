@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Timers;
+// It is mildly horrifying that spectre is also the name of a hardware flaw in modern CPUs, but I digress.
 using Spectre.Console;
 
 namespace CalavHashScanner
@@ -24,6 +25,7 @@ namespace CalavHashScanner
         static async Task Main(string[] args)
         {
             DateTime firstCommit = new DateTime(2026, 6, 5);
+            DateTime devsBirthday = new DateTime(2012, 12, 25);
             DateTime today = DateTime.Today;
 
             TimeSpan difference = today - firstCommit;
@@ -37,6 +39,10 @@ namespace CalavHashScanner
             {
                 AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
                 return;
+            }
+            if (DateTime.Now.Date == devsBirthday)
+            {
+                AnsiConsole.MarkupLine("[bold yellow]Happy birthday, glkdrlgkrlzflnjkgh![/]");
             }
             foreach (string arg in args) {
                 if (arg == "--stats" || arg == "-s") {
