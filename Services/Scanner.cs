@@ -74,7 +74,7 @@ namespace CalavHashScanner.Services
 
             if (threats > 0)
             {
-                AnsiConsole.MarkupLine("\n[bold red] !!!! THREATS FOUND !!!![/]");
+                AnsiConsole.MarkupLine("\n[bold red]!!!! THREATS FOUND !!!![/]");
                 AnsiConsole.MarkupLine("[yellow]Please review the following file paths for potential threats:[/]");
 
                 foreach (var t in threatPaths)
