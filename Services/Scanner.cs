@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.IO;
+// Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 using Spectre.Console;
 using CalavHashScanner.Utils;
 
