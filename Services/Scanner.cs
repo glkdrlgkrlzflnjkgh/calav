@@ -1,7 +1,6 @@
 // Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 using Spectre.Console;
 using CalavHashScanner.Utils;
-
 namespace CalavHashScanner.Services
 {
     public static class Scanner
@@ -10,7 +9,18 @@ namespace CalavHashScanner.Services
         {
             AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");
 			
-            var files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
+            List<string> files = new List<string>();
+			try
+			{
+				files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
+			}
+			catch (Exception ex)
+			{
+				AnsiConsole.MarkupLine("[red]Error enumerating files![/]");
+				AnsiConsole.WriteException(ex);
+				return;
+
+			}
             AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
             int total = files.Count;
             AnsiConsole.MarkupLine($"Found [green]{total}[/] files.\n");
@@ -30,13 +40,16 @@ namespace CalavHashScanner.Services
             AnsiConsole.Progress()
                 .AutoClear(true)
                 .Columns(
-                    new ProgressBarColumn(),
-                    new PercentageColumn(),
-                    new RemainingTimeColumn(),
-                    new TaskDescriptionColumn())
+                    new TaskDescriptionColumn(),
+					new PercentageColumn(),
+					new SpinnerColumn(),
+					new RemainingTimeColumn(),
+					new ElapsedTimeColumn()
+                    )
                 .Start(ctx =>
                 {
-                    var task = ctx.AddTask("[green]Scanning files[/]", maxValue: total);
+                    var task = ctx.AddTask("[green]Scanning files:[/]", maxValue: total);
+					
 
                     Parallel.ForEach(
                         files,
