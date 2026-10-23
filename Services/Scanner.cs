@@ -26,7 +26,7 @@ namespace CalavHashScanner.Services
 			int maxParallel = Environment.ProcessorCount;
             object lockObj = new object();
             List<string> threatPaths = new List<string>();
-
+			AnsiConsole.MarkupLine($"Using [cyan]{maxParallel.ToString()}[/cyan] threads!");
             AnsiConsole.Progress()
                 .AutoClear(true)
                 .Columns(
