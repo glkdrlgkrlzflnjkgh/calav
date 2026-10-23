@@ -6,10 +6,10 @@ namespace CalavHashScanner.Services
 {
     public static class Scanner
     {
-        public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad)
+		public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad)
         {
             AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");
-
+			
             var files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
             AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
             int total = files.Count;
@@ -23,6 +23,7 @@ namespace CalavHashScanner.Services
 
             int processed = 0;
             int threats = 0;
+			int maxParallel = Environment.ProcessorCount;
             object lockObj = new object();
             List<string> threatPaths = new List<string>();
 
@@ -39,7 +40,7 @@ namespace CalavHashScanner.Services
 
                     Parallel.ForEach(
                         files,
-                        new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                        new ParallelOptions { MaxDegreeOfParallelism = maxParallel },
                         file =>
                         {
                             try
