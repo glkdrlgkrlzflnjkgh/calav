@@ -54,9 +54,7 @@ namespace CalavHashScanner.Services
                 .Columns(
                     new TaskDescriptionColumn(),
 					new PercentageColumn(),
-					new SpinnerColumn(),
-					new RemainingTimeColumn(),
-					new ElapsedTimeColumn()
+					new SpinnerColumn()
                     )
                 .Start(ctx =>
                 {
@@ -91,11 +89,7 @@ namespace CalavHashScanner.Services
                             {
                                 int done = Interlocked.Increment(ref processed);
                                 task.Increment(1);
-								
-								if (processed % uiInterval == 0)
-								{
-									task.Description = $"Scanning... ({done}/{total})";
-								}
+									task.Description = $"Scanning... ({processed}/{total}) ({Markup.Escape(Path.GetFileName(file))})";
                             }
                         });
                 });
