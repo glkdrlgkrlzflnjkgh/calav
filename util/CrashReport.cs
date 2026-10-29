@@ -1,6 +1,5 @@
 using Spectre.Console;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
+
 namespace CalavHashScanner.Utils {
 	/// <summary>
 	/// Defines the data structure for a crash report,
@@ -9,7 +8,7 @@ namespace CalavHashScanner.Utils {
 	public class CrashReport
 	{
 		string Message;
-		Exception Exc;
+		public Exception Exc;
 		public CrashReport(string message, Exception exception)
 		{
 			Message = message;
