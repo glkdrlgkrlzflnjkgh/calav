@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Spectre.Console;
 using CalavHashScanner.Services;
-
+using CalavHashScanner.Utils;
 namespace CalavHashScanner
 {
 	class Program
@@ -88,10 +88,9 @@ namespace CalavHashScanner
 			}
 			catch (Exception ex)
 			{
-				
-				AnsiConsole.MarkupLine("[red bold]An Error Has Occured![/]");
-				AnsiConsole.WriteException(ex);
-				AnsiConsole.MarkupLine("\n[red]Please check the details above.[/]");
+				CrashReport c = new CrashReport("Fatal exception!", ex);
+				c.Render();
+				Environment.Exit(1);
 			}
 		}
 	}
