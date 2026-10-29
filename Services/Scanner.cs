@@ -1,46 +1,58 @@
 // Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 using Spectre.Console;
 using CalavHashScanner.Utils;
+using System.IO;
+using System.Diagnostics;
 
 namespace CalavHashScanner.Services
 {
     public static class Scanner
     {
+		//TODO: Improve speed of enumeration
 		public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad)
         {
-            AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");
-			
-            var files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
-            AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
+            
+			AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
+			Stopwatch enumsw = Stopwatch.StartNew();
+            var files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories)
+				.Where(f => File.Exists(f)) // Ensure it's a file
+				.ToList();
+			AnsiConsole.MarkupLine($"Scanning directory [blue]{directory}[/]\n");
+
+
+            
             int total = files.Count;
-            AnsiConsole.MarkupLine($"Found [green]{total}[/] files.\n");
+            enumsw.Stop();
+			AnsiConsole.MarkupLine($"Found [green]{total}[/] files, taking {(int)enumsw.ElapsedMilliseconds}ms!\n");
 
             if (total == 0)
             {
-                AnsiConsole.MarkupLine("[yellow]Nothing to scan.[/]");
+                AnsiConsole.MarkupLine("[yellow]Nothing here![/]");
                 return;
             }
 
             int processed = 0;
             int threats = 0;
+			int uiInterval = 5;
 			int maxParallel = Environment.ProcessorCount;
+			if (maxParallel == 1)
+			{
+				AnsiConsole.MarkupLine("[yellow]WARNING: You only have ONE THREAD! The scan will be single-threaded and will be VERY SLOW!![/]");
+			}
             object lockObj = new object();
             List<string> threatPaths = new List<string>();
-			AnsiConsole.MarkupLine($"Using [blue]{maxParallel.ToString()}[/] threads!");
+			AnsiConsole.MarkupLine($"Using [blue]{maxParallel}[/] threads!");
             AnsiConsole.Progress()
                 .AutoClear(true)
                 .Columns(
-                    new ProgressBarColumn(),
-                    new PercentageColumn(),
-                    new RemainingTimeColumn(),
+					new SpinnerColumn(),
                     new TaskDescriptionColumn())
                 .Start(ctx =>
                 {
-                    var task = ctx.AddTask("[green]Scanning files[/]", maxValue: total);
-
+                    ProgressTask task = ctx.AddTask("[green]Scanning files[/]", maxValue: total); //TODO: Remove this base message: it will be gone very fast.
                     Parallel.ForEach(
                         files,
-                        new ParallelOptions { MaxDegreeOfParallelism = maxParallel },
+                        new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default }, //FIXME: If the builtin scheduler does NOT impliment work-stealing, we should switch to a library that provides a scheduler that does.
                         file =>
                         {
                             try
@@ -51,10 +63,11 @@ namespace CalavHashScanner.Services
                                 {
                                     lock (lockObj)
                                     {
-                                        threats++;
+                                        AnsiConsole.MarkupLine($"[red]THREAT FOUND! ({Markup.Escape(Path.GetFileName(file))}) (known-bad hash: {hash})[/]");
+										threats++;
                                         threatPaths.Add(file);
                                     }
-                                }
+								}
                             }
                             catch (Exception ex)
                             {
@@ -65,6 +78,11 @@ namespace CalavHashScanner.Services
                             {
                                 int done = Interlocked.Increment(ref processed);
                                 task.Increment(1);
+								
+								if (processed % uiInterval == 0)
+								{
+									task.Description = $"Scanning... ({done}/{total})";
+								}
                             }
                         });
                 });
@@ -80,7 +98,6 @@ namespace CalavHashScanner.Services
 
                 foreach (var t in threatPaths)
                     AnsiConsole.MarkupLine($" - [bold red]{t}[/]");
-                AnsiConsole.MarkupLine("\n[red]Please take appropriate action to investigate and mitigate these threats![/]");
                 AnsiConsole.MarkupLine("[red]Note that these may be false positives.[/]");
                 
             }

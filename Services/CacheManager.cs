@@ -61,6 +61,7 @@ namespace CalavHashScanner.Services
 
         public static HashSet<string> LoadKnownBadHashes(string path)
         {
+			AnsiConsole.MarkupLine($"[green]Loading known-bad hashes from {path}[/]");
             var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             using var reader = new StreamReader(path, Encoding.UTF8);
@@ -68,7 +69,6 @@ namespace CalavHashScanner.Services
             Stopwatch Start = Stopwatch.StartNew();
             while ((line = reader.ReadLine()) != null)
             {
-                
                 line = line.Trim();
                 if (string.IsNullOrEmpty(line)) continue;
                 if (line.StartsWith("#")) continue;

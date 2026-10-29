@@ -60,7 +60,7 @@ namespace CalavHashScanner
 					debugMode = true;
 				}
 			}
-
+			
 			string directory = args[0];
 
 			if (!Directory.Exists(directory))
@@ -70,11 +70,11 @@ namespace CalavHashScanner
 			}
 
 			string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-			string baseDir = Path.Combine(home, "calav", "hashing");
+			string baseDir = Path.Combine(home, "calav", "cache", "hashes");
 			Directory.CreateDirectory(baseDir);
 
-			string cacheListPath = Path.Combine(baseDir, "hashes.txt");
-			string cacheHashPath = Path.Combine(baseDir, "cachehash.txt");
+			string cacheListPath = Path.Combine(baseDir, "hashes.cache");
+			string cacheHashPath = Path.Combine(baseDir, "cachehash.cache");
 
 			try
 			{
@@ -88,10 +88,10 @@ namespace CalavHashScanner
 			}
 			catch (Exception ex)
 			{
-				AnsiConsole.MarkupLine("[red bold]!!! AN EXCEPTION HAS BEEN THROWN !!![/]");
+				
+				AnsiConsole.MarkupLine("[red bold]An Error Has Occured![/]");
 				AnsiConsole.WriteException(ex);
-				AnsiConsole.MarkupLine("[red bold]!!! END OF EXCEPTION !!![/]");
-				AnsiConsole.MarkupLine("\n[red]An error occurred during execution. Please check the details above.[/]");
+				AnsiConsole.MarkupLine("\n[red]Please check the details above.[/]");
 			}
 		}
 	}
