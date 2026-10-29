@@ -20,11 +20,10 @@ namespace CalavHashScanner.Services
 			{
 				files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
 			}
-			catch (Exception ex)
+			catch 
 			{
 				AnsiConsole.MarkupLine("[red]Error enumerating files![/]");
-				AnsiConsole.WriteException(ex);
-				return;
+				throw; // rethrow, caller should handle.
 
 			}
             AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
@@ -40,21 +39,17 @@ namespace CalavHashScanner.Services
 
             int processed = 0;
             int threats = 0;
-			int uiInterval = 5;
+
 			int maxParallel = Environment.ProcessorCount;
-			if (maxParallel == 1)
-			{
-				AnsiConsole.MarkupLine("[yellow]WARNING: You only have ONE THREAD! The scan will be single-threaded and will be VERY SLOW!![/]");
-			}
             object lockObj = new object();
             List<string> threatPaths = new List<string>();
 			AnsiConsole.MarkupLine($"Using [blue]{maxParallel}[/] threads!");
             AnsiConsole.Progress()
                 .AutoClear(true)
                 .Columns(
-                    new TaskDescriptionColumn(),
-					new PercentageColumn(),
-					new SpinnerColumn()
+						new PercentageColumn(),
+						new SpinnerColumn(),
+						new TaskDescriptionColumn()
                     )
                 .Start(ctx =>
                 {
@@ -89,7 +84,7 @@ namespace CalavHashScanner.Services
                             {
                                 int done = Interlocked.Increment(ref processed);
                                 task.Increment(1);
-									task.Description = $"Scanning... ({processed}/{total}) ({Markup.Escape(Path.GetFileName(file))})";
+								task.Description = $"Scanning... ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
                             }
                         });
                 });
@@ -103,16 +98,15 @@ namespace CalavHashScanner.Services
                 AnsiConsole.MarkupLine("\n[bold red]!!!! THREATS FOUND !!!![/]");
                 AnsiConsole.MarkupLine("[yellow]Please review the following file paths for potential threats:[/]");
 
-                foreach (var t in threatPaths)
+                foreach (string t in threatPaths)
                     AnsiConsole.MarkupLine($" - [bold red]{t}[/]");
-                AnsiConsole.MarkupLine("[red]Note that these may be false positives.[/]");
+                AnsiConsole.MarkupLine("[yellow]Note that these may be false positives.[/]");
                 
             }
             else
             {
                 AnsiConsole.MarkupLine("[green]No known threats detected! :)[/]");
-                AnsiConsole.MarkupLine("[green]However, always stay vigilant and keep your software up to date![/]");
-                AnsiConsole.MarkupLine("[green]Keep up the good work![/]");
+                AnsiConsole.MarkupLine("[green]Keep up the good work, but stay vigilant![/]");
             }
         }
     }
