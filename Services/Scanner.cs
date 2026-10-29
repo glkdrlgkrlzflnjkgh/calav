@@ -11,16 +11,21 @@ namespace CalavHashScanner.Services
 		//TODO: Improve speed of enumeration
 		public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad)
         {
-            
-			AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
-			Stopwatch enumsw = Stopwatch.StartNew();
-            var files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories)
-				.Where(f => File.Exists(f)) // Ensure it's a file
-				.ToList();
-			AnsiConsole.MarkupLine($"Scanning directory [blue]{directory}[/]\n");
+            AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");
+			
+            List<string> files = new List<string>();
+			try
+			{
+				files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
+			}
+			catch (Exception ex)
+			{
+				AnsiConsole.MarkupLine("[red]Error enumerating files![/]");
+				AnsiConsole.WriteException(ex);
+				return;
 
-
-            
+			}
+            AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
             int total = files.Count;
             enumsw.Stop();
 			AnsiConsole.MarkupLine($"Found [green]{total}[/] files, taking {(int)enumsw.ElapsedMilliseconds}ms!\n");
@@ -45,11 +50,17 @@ namespace CalavHashScanner.Services
             AnsiConsole.Progress()
                 .AutoClear(true)
                 .Columns(
+                    new TaskDescriptionColumn(),
+					new PercentageColumn(),
 					new SpinnerColumn(),
-                    new TaskDescriptionColumn())
+					new RemainingTimeColumn(),
+					new ElapsedTimeColumn()
+                    )
                 .Start(ctx =>
                 {
-                    ProgressTask task = ctx.AddTask("[green]Scanning files[/]", maxValue: total); //TODO: Remove this base message: it will be gone very fast.
+                    var task = ctx.AddTask("[green]Scanning files:[/]", maxValue: total);
+					
+
                     Parallel.ForEach(
                         files,
                         new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default }, //FIXME: If the builtin scheduler does NOT impliment work-stealing, we should switch to a library that provides a scheduler that does.
