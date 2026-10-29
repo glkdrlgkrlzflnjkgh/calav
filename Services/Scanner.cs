@@ -14,6 +14,8 @@ namespace CalavHashScanner.Services
             AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");
 			
             List<string> files = new List<string>();
+			Stopwatch enumsw = Stopwatch.StartNew();
+			
 			try
 			{
 				files = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).ToList();
