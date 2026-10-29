@@ -8,7 +8,11 @@ namespace CalavHashScanner.Services
 {
     public static class Scanner
     {
-		//TODO: Improve speed of enumeration
+		/// <summary>
+		/// Scans a directory in parallel threads, reporting any threats and providing detailed console output.
+		/// </summary>
+		/// <param name="directory"></param>
+		/// <param name="knownBad"></param>
 		public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad)
         {
             AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");

@@ -1,8 +1,5 @@
 ﻿// Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Spectre.Console;
 using CalavHashScanner.Services;
 using CalavHashScanner.Utils;
@@ -11,7 +8,6 @@ namespace CalavHashScanner
 	class Program
 	{
 		public static bool debugMode;
-
 		// Remote hash list URL
 		private const string HashListUrl =
 			"https://raw.githubusercontent.com/romainmarcoux/malicious-hash/refs/heads/main/full-hash-sha256-aa.txt";
@@ -75,9 +71,9 @@ namespace CalavHashScanner
 
 			string cacheListPath = Path.Combine(baseDir, "hashes.cache");
 			string cacheHashPath = Path.Combine(baseDir, "cachehash.cache");
-
+			
 			try
-			{
+			{ 
 				await CacheManager.EnsureHashListUpToDateAsync(HashListUrl, cacheListPath, cacheHashPath);
 
 				var knownBad = CacheManager.LoadKnownBadHashes(cacheListPath);
@@ -88,8 +84,8 @@ namespace CalavHashScanner
 			}
 			catch (Exception ex)
 			{
-				CrashReport c = new CrashReport("Fatal exception!", ex);
-				c.Render();
+				CrashReport c = new CrashReport("[red bold]Fatal exception![/]", ex);
+				c.Render();				
 				Environment.Exit(1);
 			}
 		}
