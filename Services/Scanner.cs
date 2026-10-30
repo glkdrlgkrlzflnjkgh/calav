@@ -81,7 +81,7 @@ public static class Scanner
                 task.IsIndeterminate = false;
                 Parallel.ForEach(
                     files,
-                    new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default }, //FIXME: If the builtin scheduler does NOT impliment work-stealing, we should switch to a library that provides a scheduler that does.
+                    new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default }, 
                     file =>
                     {
                         try
