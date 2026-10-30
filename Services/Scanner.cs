@@ -1,8 +1,10 @@
 // Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 using Spectre.Console;
 using CalavHashScanner.Util;
+using CalavHashScanner.utils;
 using System.Diagnostics;
-
+using CalavHashScanner.CustomSpectre;
+using CalavScanner.utils;
 namespace CalavHashScanner.Services;
 
 public static class Scanner
@@ -21,7 +23,16 @@ public static class Scanner
 
         try
         {
-            files = [.. Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories)];
+            AnsiConsole.Status()
+            .Spinner(Spinner.Known.SimpleDotsScrolling)
+            .Start("Enumerating files", _ =>
+            {
+                files = [.. Directory.EnumerateFiles(
+                    directory,
+                    "*",
+                    SearchOption.AllDirectories
+                )];
+            });
         }
         catch
         {
@@ -29,7 +40,7 @@ public static class Scanner
             throw; // rethrow, caller should handle.
 
         }
-        AnsiConsole.MarkupLine("[green]Enumerating files...[/]");
+
         int total = files.Count;
         enumsw.Stop();
         AnsiConsole.MarkupLine($"Found [green]{total}[/] files, taking {(int)enumsw.ElapsedMilliseconds}ms!\n");
@@ -44,6 +55,15 @@ public static class Scanner
         int threats = 0;
 
         int maxParallel = Environment.ProcessorCount;
+        if (maxParallel < 4 || Program.testCores)
+        {
+            Prompt p = new("You have less than 4 cores available, and continuing could cause **SEVERE** system slowdowns. Are you sure?");
+            string r = p.Ask();
+            if (r != "yes")
+            {
+                return;
+            }
+        }
         object lockObj = new();
         List<string> threatPaths = [];
         AnsiConsole.MarkupLine($"Using [blue]{maxParallel}[/] threads!");
@@ -51,14 +71,14 @@ public static class Scanner
             .AutoClear(true)
             .Columns(
                         new PercentageColumn(),
-                        new SpinnerColumn(),
+                        new SpinnerColumn(Spinner.Known.SimpleDotsScrolling),
+                        new CalavProgressColumn(),
                         new TaskDescriptionColumn()
                 )
             .Start(ctx =>
             {
                 var task = ctx.AddTask("[green]Scanning files:[/]", maxValue: total);
-
-
+                task.IsIndeterminate = false;
                 Parallel.ForEach(
                     files,
                     new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default }, //FIXME: If the builtin scheduler does NOT impliment work-stealing, we should switch to a library that provides a scheduler that does.
@@ -81,13 +101,15 @@ public static class Scanner
                         catch (Exception ex)
                         {
                             AnsiConsole.MarkupLine($"[red]Error processing file:[/] {file} Exception: {ex.Message}");
-                            return;
                         }
                         finally
                         {
                             int done = Interlocked.Increment(ref processed);
                             task.Increment(1);
-                            task.Description = $"Scanning... ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
+                            lock (lockObj)
+                            {
+                                task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
+                            }  
                         }
                     });
             });

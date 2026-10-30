@@ -8,6 +8,7 @@ namespace CalavHashScanner;
 static class Program
 {
     public static bool debugMode;
+    public static bool testCores;
     // Remote hash list URL
     private const string HashListUrl =
         "https://raw.githubusercontent.com/romainmarcoux/malicious-hash/refs/heads/main/full-hash-sha256-aa.txt";
@@ -62,6 +63,11 @@ static class Program
                 AnsiConsole.MarkupLine("[bold cyan]Verbose/Debug mode active! Logs will be messier but better for debugging![/]");
                 debugMode = true;
             }
+
+            if (arg == "--test-less-4-cores")
+            {
+                testCores = true;
+            }
         }
 
         string directory = args[0];
@@ -73,8 +79,11 @@ static class Program
         }
 
         string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        string baseDir = Path.Combine(home, "calav", "cache", "hashes");
+        string calavDir = Path.Combine(home, "calav");
+        string baseDir = Path.Combine(calavDir, "cache", "hashes");
+        string crashReportDir = Path.Combine(calavDir, "crashes");
         Directory.CreateDirectory(baseDir);
+        Directory.CreateDirectory(crashReportDir);
 
         string cacheListPath = Path.Combine(baseDir, "hashes.cache");
         string cacheHashPath = Path.Combine(baseDir, "cachehash.cache");
@@ -93,8 +102,12 @@ static class Program
         {
             CrashReport c = new("[red bold]Fatal exception![/]", ex);
             c.Render();
-            // below line is commented out as CrashReport.Save is unimplimented and currently throws NotImplimentedException.
-            //c.Save(cacheListPath);
+            string crashPath = Path.Combine(
+                crashReportDir,
+                $"crash_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss}.txt"
+            );
+
+            c.Save(crashPath);
             Environment.Exit(1);
         }
     }

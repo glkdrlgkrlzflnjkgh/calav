@@ -36,12 +36,29 @@ public class CrashReport(string message, Exception exception)
     }
     /// <summary>
     /// Function to save a crash report to a .txt file at the target path.
-    /// CURRENTLY NOT IMPLIMENTED!
     /// </summary>
     /// <param name="path"></param>
     public void Save(string path)
     {
-        //TODO: Impliment this!
-        throw new NotImplementedException();
+        using StreamWriter writer = new(path, false, System.Text.Encoding.UTF8);
+
+        writer.WriteLine("---- BEGIN CRASH REPORT ----");
+        writer.WriteLine(Message);
+        writer.WriteLine("Details of the error, including stacktrace.");
+
+        writer.WriteLine($"Exception Message: {Exc.Message}");
+        writer.WriteLine($"Exception StackTrace: {Exc.StackTrace}");
+        writer.WriteLine($"Exception Source: {Exc.Source}");
+
+        if (Exc.HelpLink != null)
+        {
+            writer.WriteLine($"Help Link: {Exc.HelpLink}");
+        }
+        else
+        {
+            writer.WriteLine("The exception does not have a help link.");
+        }
+
+        writer.WriteLine("---- END CRASH REPORT ----");
     }
 }

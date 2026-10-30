@@ -15,13 +15,25 @@ public static class HashUtils
     {
         return Convert.ToHexStringLower(bytes);
     }
+   
+    /// <summary>
+    /// Computes the SHA-256 hash of a file, returning a hex string.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    //TODO: Optimize this if possible?
     public static string ComputeSha256File(string path)
     {
         using var stream = File.OpenRead(path);
         var hashBytes = SHA256.HashData(stream);
         return BytesToHex(hashBytes);
     }
-
+    /// <summary>
+    /// Computes the SHA-256 of a String object.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    //TODO: Optimize this aswell?
     public static string ComputeSha256String(string text)
     {
         var bytes = Encoding.UTF8.GetBytes(text);
