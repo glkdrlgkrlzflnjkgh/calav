@@ -2,7 +2,7 @@
 
 using Spectre.Console;
 using CalavHashScanner.Services;
-using CalavHashScanner.Utils;
+using CalavHashScanner.utils;
 namespace CalavHashScanner;
 
 static class Program
@@ -12,8 +12,14 @@ static class Program
     private const string HashListUrl =
         "https://raw.githubusercontent.com/romainmarcoux/malicious-hash/refs/heads/main/full-hash-sha256-aa.txt";
 
+    /// <summary>
+    /// The main entrypoint to the program... DUH!
+    /// </summary>
     static async Task Main(string[] args)
     {
+        Logging logger = new(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/calav");
+
+
         DateTime firstCommit = new(2026, 6, 5);
         DateTime today = DateTime.Today;
         TimeSpan difference = today - firstCommit;
@@ -27,6 +33,7 @@ static class Program
             AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
             return;
         }
+
 
         foreach (string arg in args)
         {
@@ -52,7 +59,7 @@ static class Program
             }
             if (arg == "--debug" || arg == "-d")
             {
-                AnsiConsole.MarkupLine("[bold cyan]DEBUG MODE ACTIVATED[/]");
+                AnsiConsole.MarkupLine("[bold cyan]Verbose/Debug mode active! Logs will be messier but better for debugging![/]");
                 debugMode = true;
             }
         }

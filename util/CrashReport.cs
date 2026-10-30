@@ -1,6 +1,6 @@
 using Spectre.Console;
 
-namespace CalavHashScanner.Utils;
+namespace CalavHashScanner.utils;
 
 /// <summary>
 /// Defines the data structure for a crash report,
