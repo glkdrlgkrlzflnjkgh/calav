@@ -16,9 +16,8 @@ public static class HashUtils
 
     public static string ComputeSha256String(string text)
     {
-        using var sha = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(text);
-        var hashBytes = sha.ComputeHash(bytes);
+        var hashBytes = SHA256.HashData(bytes);
         return BytesToHex(hashBytes);
     }
 

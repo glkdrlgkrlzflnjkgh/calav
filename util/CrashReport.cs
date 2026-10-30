@@ -6,15 +6,11 @@ namespace CalavHashScanner.Utils;
 /// Defines the data structure for a crash report,
 /// and allows for printing it to the console (see the Render method for more information)
 /// </summary>
-public class CrashReport
+public class CrashReport(string message, Exception exception)
 {
-    string Message;
-    public Exception Exc;
-    public CrashReport(string message, Exception exception)
-    {
-        Message = message;
-        Exc = exception;
-    }
+    readonly string Message = message;
+    public Exception Exc = exception;
+
     /// <summary>
     /// A method to render a crash report to the screeen.
     /// Takes no arguments and has no overloads.
@@ -40,16 +36,12 @@ public class CrashReport
     }
     /// <summary>
     /// Function to save a crash report to a .txt file at the target path.
+    /// CURRENTLY NOT IMPLIMENTED!
     /// </summary>
     /// <param name="path"></param>
     public void Save(string path)
     {
-        using (StreamWriter stream = new(path))
-        {
-            unchecked
-            {
-
-            }
-        }
+        //TODO: Impliment this!
+        throw new NotImplementedException();
     }
 }

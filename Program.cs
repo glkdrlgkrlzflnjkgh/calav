@@ -19,7 +19,7 @@ static class Program
         TimeSpan difference = today - firstCommit;
         int daysSince = difference.Days;
 
-        AnsiConsole.MarkupLine("[bold cyan]=== Calav Hash Scanner ===[/]");
+        AnsiConsole.MarkupLine("[bold green]=== Calav Hash Scanner ===[/]");
         AnsiConsole.MarkupLine("Hash-based, cache-aware, multithreaded scanner.\n");
 
         if (args.Length == 0)
@@ -86,6 +86,8 @@ static class Program
         {
             CrashReport c = new("[red bold]Fatal exception![/]", ex);
             c.Render();
+            // below line is commented out as CrashReport.Save is unimplimented and currently throws NotImplimentedException.
+            //c.Save(cacheListPath);
             Environment.Exit(1);
         }
     }
