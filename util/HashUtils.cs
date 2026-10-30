@@ -6,6 +6,10 @@ namespace CalavHashScanner.Util;
 
 public static class HashUtils
 {
+    public static string BytesToHex(byte[] bytes)
+    {
+        return Convert.ToHexStringLower(bytes);
+    }
     public static string ComputeSha256File(string path)
     {
         using var stream = File.OpenRead(path);
@@ -18,13 +22,5 @@ public static class HashUtils
         var bytes = Encoding.UTF8.GetBytes(text);
         var hashBytes = SHA256.HashData(bytes);
         return BytesToHex(hashBytes);
-    }
-
-    public static string BytesToHex(byte[] bytes)
-    {
-        var sb = new StringBuilder(bytes.Length * 2);
-        foreach (var b in bytes)
-            sb.Append(b.ToString("x2"));
-        return sb.ToString();
     }
 }
