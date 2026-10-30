@@ -9,8 +9,7 @@ public static class HashUtils
     public static string ComputeSha256File(string path)
     {
         using var stream = File.OpenRead(path);
-        using var sha = SHA256.Create();
-        var hashBytes = sha.ComputeHash(stream);
+        var hashBytes = SHA256.HashData(stream);
         return BytesToHex(hashBytes);
     }
 
