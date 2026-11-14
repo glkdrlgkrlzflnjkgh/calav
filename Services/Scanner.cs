@@ -23,16 +23,27 @@ public static class Scanner
 
         try
         {
+            files = [];
+
             AnsiConsole.Status()
-            .Spinner(Spinner.Known.SimpleDotsScrolling)
-            .Start("Enumerating files...", _ =>
-            {
-                files = [.. Directory.EnumerateFiles(
-                    directory,
-                    "*",
-                    SearchOption.AllDirectories
-                )];
-            });
+                .Spinner(Spinner.Known.SimpleDotsScrolling)
+                .Start("Enumerating files...", ctx =>
+                {
+                    int count = 0;
+
+                    foreach (string file in Directory.EnumerateFiles(
+                        directory,
+                        "*",
+                        SearchOption.AllDirectories))
+                    {
+                        files.Add(file);
+
+                        count++;
+                        ctx.Status($"Enumerating files... Found {count:N0} files");
+                    }
+
+                    ctx.Status($"Enumerating complete! Found {count:N0} files");
+                });
         }
         catch
         {
@@ -92,7 +103,6 @@ public static class Scanner
                             {
                                 lock (lockObj)
                                 {
-                                    AnsiConsole.MarkupLine($"[red]THREAT FOUND! ({Markup.Escape(Path.GetFileName(file))}) (known-bad hash: {hash})[/]");
                                     threats++;
                                     threatPaths.Add(file);
                                 }
@@ -106,10 +116,13 @@ public static class Scanner
                         {
                             int done = Interlocked.Increment(ref processed);
                             task.Increment(1);
-                            lock (lockObj)
+                            if (done % 10 == 0) 
                             {
-                                task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
-                            }  
+                                lock (lockObj)
+                                {
+                                    task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
+                                }  
+                            }
                         }
                     });
             });
