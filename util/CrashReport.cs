@@ -4,7 +4,7 @@ namespace CalavHashScanner.utils;
 
 /// <summary>
 /// Defines the data structure for a crash report,
-/// and allows for printing it to the console (see the Render method for more information)
+/// and impliments printing it to the console and saving it to a file.
 /// </summary>
 public class CrashReport(string message, Exception exception)
 {

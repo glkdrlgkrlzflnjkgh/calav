@@ -25,7 +25,7 @@ public static class Scanner
         {
             AnsiConsole.Status()
             .Spinner(Spinner.Known.SimpleDotsScrolling)
-            .Start("Enumerating files", _ =>
+            .Start("Enumerating files...", _ =>
             {
                 files = [.. Directory.EnumerateFiles(
                     directory,
