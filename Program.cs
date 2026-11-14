@@ -1,4 +1,4 @@
-// Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
+﻿// Calav is licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 using Spectre.Console;
 using CalavHashScanner.Services;
@@ -28,7 +28,7 @@ static class Program
 
         AnsiConsole.MarkupLine("[bold green]=== Calav Hash Scanner ===[/]");
         AnsiConsole.MarkupLine("Hash-based, cache-aware, multithreaded scanner.\n");
-
+        
         if (args.Length == 0)
         {
             AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
