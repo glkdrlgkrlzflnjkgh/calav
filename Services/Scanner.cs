@@ -7,35 +7,30 @@ using CalavHashScanner.CustomSpectre;
 using CalavScanner.utils;
 namespace CalavHashScanner.Services;
 
-public static class Scanner
-{
+public static class Scanner {
     /// <summary>
     /// Scans a directory in parallel threads, reporting any threats and providing detailed console output.
     /// </summary>
     /// <param name="directory"></param>
     /// <param name="knownBad"></param>
-    public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad)
-    {
+    public static void ScanDirectoryMultithreaded(string directory, HashSet<string> knownBad) {
         AnsiConsole.MarkupLine($"Scanning directory (multithreaded): [blue]{directory}[/]\n");
 
         List<string> files = [];
         Stopwatch enumsw = Stopwatch.StartNew();
 
-        try
-        {
+        try {
             files = [];
 
             AnsiConsole.Status()
                 .Spinner(Spinner.Known.SimpleDotsScrolling)
-                .Start("Enumerating files...", ctx =>
-                {
+                .Start("Enumerating files...", ctx => {
                     int count = 0;
 
                     foreach (string file in Directory.EnumerateFiles(
                         directory,
                         "*",
-                        SearchOption.AllDirectories))
-                    {
+                        SearchOption.AllDirectories)) {
                         files.Add(file);
 
                         count++;
@@ -45,8 +40,7 @@ public static class Scanner
                     ctx.Status($"Enumerating complete! Found {count:N0} files");
                 });
         }
-        catch
-        {
+        catch {
             AnsiConsole.MarkupLine("[red]Error enumerating files![/]");
             throw; // rethrow, caller should handle.
 
@@ -56,8 +50,7 @@ public static class Scanner
         enumsw.Stop();
         AnsiConsole.MarkupLine($"Found [green]{total}[/] files, taking {(int)enumsw.ElapsedMilliseconds}ms!\n");
 
-        if (total == 0)
-        {
+        if (total == 0) {
             AnsiConsole.MarkupLine("[yellow]Nothing here![/]");
             return;
         }
@@ -66,12 +59,9 @@ public static class Scanner
         int threats = 0;
 
         int maxParallel = Environment.ProcessorCount;
-        if (maxParallel < 4 || Program.testCores)
-        {
-            Prompt p = new("You have less than 4 cores available, and continuing could cause **SEVERE** system slowdowns. Are you sure?");
-            string r = p.Ask();
-            if (r != "yes")
-            {
+        if (maxParallel < 4 || Program.testCores) {
+            string r = new Prompt("You have less than 4 cores available, and continuing could cause **SEVERE** system slowdowns. Are you sure?").Ask();
+            if (r != "yes") {
                 return;
             }
         }
@@ -86,42 +76,33 @@ public static class Scanner
                         new CalavProgressColumn(),
                         new TaskDescriptionColumn()
                 )
-            .Start(ctx =>
-            {
+            .Start(ctx => {
                 var task = ctx.AddTask("[green]Scanning files:[/]", maxValue: total);
                 task.IsIndeterminate = false;
                 Parallel.ForEach(
                     files,
-                    new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default }, 
-                    file =>
-                    {
-                        try
-                        {
+                    new ParallelOptions { MaxDegreeOfParallelism = maxParallel, TaskScheduler = TaskScheduler.Default },
+                    file => {
+                        try {
                             string hash = HashUtils.ComputeSha256File(file);
 
-                            if (knownBad.Contains(hash))
-                            {
-                                lock (lockObj)
-                                {
+                            if (knownBad.Contains(hash)) {
+                                lock (lockObj) {
                                     threats++;
                                     threatPaths.Add(file);
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
+                        catch (Exception ex) {
                             AnsiConsole.MarkupLine($"[red]Error processing file:[/] {file} Exception: {ex.Message}");
                         }
-                        finally
-                        {
+                        finally {
                             int done = Interlocked.Increment(ref processed);
                             task.Increment(1);
-                            if (done % 10 == 0) 
-                            {
-                                lock (lockObj)
-                                {
+                            if (done % 5 == 0) {
+                                lock (lockObj) {
                                     task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
-                                }  
+                                }
                             }
                         }
                     });
@@ -131,8 +112,7 @@ public static class Scanner
         AnsiConsole.MarkupLine($"Files scanned : [green]{total}[/]");
         AnsiConsole.MarkupLine($"Threats found : [red]{threats}[/]");
 
-        if (threats > 0)
-        {
+        if (threats > 0) {
             AnsiConsole.MarkupLine("\n[bold red]!!!! THREATS FOUND !!!![/]");
             AnsiConsole.MarkupLine("[yellow]Please review the following file paths for potential threats:[/]");
 
@@ -141,8 +121,7 @@ public static class Scanner
             AnsiConsole.MarkupLine("[yellow]Note that these may be false positives.[/]");
 
         }
-        else
-        {
+        else {
             AnsiConsole.MarkupLine("[green]No known threats detected! :)[/]");
             AnsiConsole.MarkupLine("[green]Keep up the good work, but stay vigilant![/]");
         }

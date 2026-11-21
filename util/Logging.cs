@@ -2,12 +2,10 @@ using Spectre.Console;
 
 namespace CalavHashScanner.utils;
 
-public class Logging
-{
-    string File;    
-    
-    public enum LogLevel
-    {
+public class Logging {
+    string File;
+
+    public enum LogLevel {
         INFO,
         WARNING,
         ERROR,
@@ -17,15 +15,12 @@ public class Logging
 
     };
 
-    public Logging(string file)
-    {
+    public Logging(string file) {
         File = file;
     }
 
-    public static string LogLevelToString(LogLevel level)
-    {
-        return level switch
-        {
+    public static string LogLevelToString(LogLevel level) {
+        return level switch {
             LogLevel.INFO => "[blue]<INFO>[/]",
             LogLevel.WARNING => "[yellow]<WARN>[/]",
             LogLevel.ERROR => "[red]<ERROR>[/]",
@@ -37,8 +32,7 @@ public class Logging
 
     }
 
-    public void Log(LogLevel level, string message)
-    {
+    public void Log(LogLevel level, string message) {
         AnsiConsole.MarkupLine($"{LogLevelToString(level)} - {message}");
     }
 }

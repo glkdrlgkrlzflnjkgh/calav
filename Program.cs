@@ -5,8 +5,7 @@ using CalavHashScanner.Services;
 using CalavHashScanner.utils;
 namespace CalavHashScanner;
 
-static class Program
-{
+static class Program {
     public static bool debugMode;
     public static bool testCores;
     // Remote hash list URL
@@ -16,8 +15,7 @@ static class Program
     /// <summary>
     /// The main entrypoint to the program... DUH!
     /// </summary>
-    static async Task Main(string[] args)
-    {
+    static async Task Main(string[] args) {
         Logging logger = new(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/calav");
 
 
@@ -28,23 +26,19 @@ static class Program
 
         AnsiConsole.MarkupLine("[bold green]=== Calav Hash Scanner ===[/]");
         AnsiConsole.MarkupLine("Hash-based, cache-aware, multithreaded scanner.\n");
-        
-        if (args.Length == 0)
-        {
+
+        if (args.Length == 0) {
             AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
             return;
         }
 
 
-        foreach (string arg in args)
-        {
-            if (arg == "--stats" || arg == "-s")
-            {
+        foreach (string arg in args) {
+            if (arg == "--stats" || arg == "-s") {
                 AnsiConsole.MarkupLine($"[cyan]CalAV has been fighting threats for:[/] [green]{daysSince}[/][cyan] days![/]");
                 return;
             }
-            if (arg == "--help" || arg == "-h")
-            {
+            if (arg == "--help" || arg == "-h") {
                 AnsiConsole.MarkupLine("[bold yellow]Usage:[/] CalavHashScanner <directory-to-scan>");
                 AnsiConsole.MarkupLine("[bold yellow]Options:[/]");
                 AnsiConsole.MarkupLine("  [green]-s, --stats[/]  Show the number of days since the first commit.");
@@ -52,28 +46,24 @@ static class Program
                 AnsiConsole.MarkupLine("  [green]-l, --license[/] Show license information.");
                 return;
             }
-            if (arg == "--license" || arg == "-l")
-            {
+            if (arg == "--license" || arg == "-l") {
                 AnsiConsole.MarkupLine("[bold yellow]Calav is licensed under the MIT License.[/]");
                 AnsiConsole.MarkupLine("See the LICENSE file in the project root or repository for full license information.");
                 return;
             }
-            if (arg == "--debug" || arg == "-d")
-            {
+            if (arg == "--debug" || arg == "-d") {
                 AnsiConsole.MarkupLine("[bold cyan]Verbose/Debug mode active! Logs will be messier but better for debugging![/]");
                 debugMode = true;
             }
 
-            if (arg == "--test-less-4-cores")
-            {
+            if (arg == "--test-less-4-cores") {
                 testCores = true;
             }
         }
 
         string directory = args[0];
 
-        if (!Directory.Exists(directory))
-        {
+        if (!Directory.Exists(directory)) {
             AnsiConsole.MarkupLine($"[red]Directory not found:[/] {directory}");
             return;
         }
@@ -88,8 +78,7 @@ static class Program
         string cacheListPath = Path.Combine(baseDir, "hashes.cache");
         string cacheHashPath = Path.Combine(baseDir, "cachehash.cache");
 
-        try
-        {
+        try {
             await CacheManager.EnsureHashListUpToDateAsync(HashListUrl, cacheListPath, cacheHashPath);
 
             var knownBad = CacheManager.LoadKnownBadHashes(cacheListPath);
@@ -98,8 +87,7 @@ static class Program
 
             Scanner.ScanDirectoryMultithreaded(directory, knownBad);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             CrashReport c = new("[red bold]Fatal exception![/]", ex);
             c.Render();
             string crashPath = Path.Combine(

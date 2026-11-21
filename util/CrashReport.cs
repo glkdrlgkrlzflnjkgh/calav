@@ -6,8 +6,7 @@ namespace CalavHashScanner.utils;
 /// Defines the data structure for a crash report,
 /// and impliments printing it to the console and saving it to a file.
 /// </summary>
-public class CrashReport(string message, Exception exception)
-{
+public class CrashReport(string message, Exception exception) {
     readonly string Message = message;
     public Exception Exc = exception;
 
@@ -16,20 +15,17 @@ public class CrashReport(string message, Exception exception)
     /// Takes no arguments and has no overloads.
     /// (Could throw if you insert markup into the message, even unintentionally. So wrap in try/catch if possible...)
     /// </summary>
-    public void Render()
-    {
+    public void Render() {
         AnsiConsole.MarkupLine("---- BEGIN CRASH REPORT ----");
         AnsiConsole.MarkupLine(Message);
         AnsiConsole.MarkupLine("Details of the error, including stacktrace.");
         Console.WriteLine($"Exception Message: {Exc.Message}");
         Console.WriteLine($"Exception StackTrace: {Exc.StackTrace}");
         Console.WriteLine($"Exception Source: {Exc.Source}");
-        if (Exc.HelpLink != null)
-        {
+        if (Exc.HelpLink != null) {
             AnsiConsole.MarkupLine($"The exception has a help link, and it is [blue]{Exc.HelpLink}[/]");
         }
-        else
-        {
+        else {
             AnsiConsole.MarkupLine("The exception does not have a help link.");
         }
         AnsiConsole.MarkupLine("--- END CRASH REPORT ----");
@@ -38,8 +34,7 @@ public class CrashReport(string message, Exception exception)
     /// Function to save a crash report to a .txt file at the target path.
     /// </summary>
     /// <param name="path"></param>
-    public void Save(string path)
-    {
+    public void Save(string path) {
         using StreamWriter writer = new(path, false, System.Text.Encoding.UTF8);
 
         writer.WriteLine("---- BEGIN CRASH REPORT ----");
@@ -50,12 +45,10 @@ public class CrashReport(string message, Exception exception)
         writer.WriteLine($"Exception StackTrace: {Exc.StackTrace}");
         writer.WriteLine($"Exception Source: {Exc.Source}");
 
-        if (Exc.HelpLink != null)
-        {
+        if (Exc.HelpLink != null) {
             writer.WriteLine($"Help Link: {Exc.HelpLink}");
         }
-        else
-        {
+        else {
             writer.WriteLine("The exception does not have a help link.");
         }
 

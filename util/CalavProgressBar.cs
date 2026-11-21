@@ -1,13 +1,12 @@
 using Spectre.Console;
 using Spectre.Console.Rendering;
 namespace CalavHashScanner.CustomSpectre;
-public sealed class CalavProgressColumn : ProgressColumn
-{
+
+public sealed class CalavProgressColumn : ProgressColumn {
     public override IRenderable Render(
         RenderOptions options,
         ProgressTask task,
-        TimeSpan deltaTime)
-    {
+        TimeSpan deltaTime) {
         double pct = task.Percentage / 100.0;
 
         const int width = 30;
@@ -15,16 +14,13 @@ public sealed class CalavProgressColumn : ProgressColumn
 
         string bar;
 
-        if (filled == 0)
-        {
+        if (filled == 0) {
             bar = ">" + new string('.', width - 1);
         }
-        else if (filled >= width)
-        {
+        else if (filled >= width) {
             bar = new string('=', width);
         }
-        else
-        {
+        else {
             bar =
                 new string('=', filled) +
                 ">" +

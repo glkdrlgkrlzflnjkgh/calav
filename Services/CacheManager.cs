@@ -7,16 +7,13 @@ using System.Data;
 
 namespace CalavHashScanner.Services;
 
-public static class CacheManager
-{
-    public static async Task EnsureHashListUpToDateAsync(string url, string cacheListPath, string cacheHashPath)
-    {
+public static class CacheManager {
+    public static async Task EnsureHashListUpToDateAsync(string url, string cacheListPath, string cacheHashPath) {
         using var client = new HttpClient();
 
         bool cacheExists = File.Exists(cacheListPath) && File.Exists(cacheHashPath);
 
-        if (!cacheExists)
-        {
+        if (!cacheExists) {
             AnsiConsole.MarkupLine("[yellow]No cache found. Downloading hash list for the first time...[/]");
             string text = await client.GetStringAsync(url);
             File.WriteAllText(cacheListPath, text, Encoding.UTF8);
@@ -32,53 +29,45 @@ public static class CacheManager
 
         string storedHash = File.ReadAllText(cacheHashPath).Trim();
         string remoteText;
-        try
-        {
+        try {
             remoteText = await client.GetStringAsync(url);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             AnsiConsole.MarkupLine($"[red]Error fetching remote hash list:[/] {ex.Message}");
             return;
         }
         string remoteHash = HashUtils.ComputeSha256String(remoteText);
-        if (Program.debugMode)
-        {
+        if (Program.debugMode) {
             AnsiConsole.MarkupLine($"[bold yellow]The hash of the remote is: {remoteHash}[/]");
             AnsiConsole.MarkupLine($"[bold yellow]The hash of local hashlist is {storedHash}[/]");
         }
-        if (!string.Equals(storedHash, remoteHash, StringComparison.OrdinalIgnoreCase))
-        {
+        if (!string.Equals(storedHash, remoteHash, StringComparison.OrdinalIgnoreCase)) {
             AnsiConsole.MarkupLine("[yellow]The remote hashlist has changed, updating cache...[/]");
 
             File.WriteAllText(cacheListPath, remoteText, Encoding.UTF8);
             File.WriteAllText(cacheHashPath, remoteHash, Encoding.UTF8);
             AnsiConsole.MarkupLine("[green]Cache updated![/]");
         }
-        else
-        {
+        else {
             AnsiConsole.MarkupLine("[green]Cache is up to date.[/]");
         }
     }
 
-    public static HashSet<string> LoadKnownBadHashes(string path)
-    {
+    public static HashSet<string> LoadKnownBadHashes(string path) {
         AnsiConsole.MarkupLine($"[green]Loading known-bad hashes from {path}[/]");
         var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         using var reader = new StreamReader(path, Encoding.UTF8);
         string? line;
         Stopwatch Start = Stopwatch.StartNew();
-        while ((line = reader.ReadLine()) != null)
-        {
+        while ((line = reader.ReadLine()) != null) {
             line = line.Trim();
             if (string.IsNullOrEmpty(line)) continue;
             if (line.StartsWith('#')) continue;
 
             if (line.Length == 64) // SHA256 hex length
                 set.Add(line);
-            else 
-            {
+            else {
                 AnsiConsole.MarkupLine($"[red]Error! Malformed line in cache detected! [/] {line}");
                 throw new SyntaxErrorException();
             }
