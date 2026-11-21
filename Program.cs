@@ -32,7 +32,7 @@ static class Program {
             return;
         }
 
-
+        //TODO: Use a proper CLI library instead of this unreadable and unreliable parsing method.
         foreach (string arg in args) {
             if (arg == "--stats" || arg == "-s") {
                 AnsiConsole.MarkupLine($"[cyan]CalAV has been fighting threats for:[/] [green]{daysSince}[/][cyan] days![/]");

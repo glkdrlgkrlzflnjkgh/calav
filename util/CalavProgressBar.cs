@@ -16,7 +16,7 @@ public sealed class CalavProgressColumn : ProgressColumn {
         string bar;
 
         if (filled == 0) {
-            bar = ">" + new string('.', width - 1);
+            bar = ">" + new string('_', width - 1);
         }
         else if (filled >= width) {
             bar = new string('-', width);
