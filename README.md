@@ -12,7 +12,7 @@ It is not realtime.
 # RELEASES
 
 Currently 2 platforms have offical builds.
-X64 Linux and X64 windows. *as of after version 0.0.2, note that 0.0.1 should not be downloaded as it is bugged.*
+X64 windows and X64 linux. DO NOT download version 0.0.1: it is broken.
 # IMPORTANT 
 If you are on windows/linux, but you are on ARM The offical builds WILL NOT RUN. (Currenly I am not supplying offical builds for ARM64)
 You will need to compile from source (after installing .NET and its associated SDK.)
