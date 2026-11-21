@@ -22,16 +22,11 @@ public class CrashReport(string message, Exception exception) {
         Console.WriteLine($"Exception Message: {Exc.Message}");
         Console.WriteLine($"Exception StackTrace: {Exc.StackTrace}");
         Console.WriteLine($"Exception Source: {Exc.Source}");
-        if (Exc.HelpLink != null) {
-            AnsiConsole.MarkupLine($"The exception has a help link, and it is [blue]{Exc.HelpLink}[/]");
-        }
-        else {
-            AnsiConsole.MarkupLine("The exception does not have a help link.");
-        }
         AnsiConsole.MarkupLine("--- END CRASH REPORT ----");
     }
     /// <summary>
     /// Function to save a crash report to a .txt file at the target path.
+    /// Has the possibility to throw. So wrap in a try/catch if possible...
     /// </summary>
     /// <param name="path"></param>
     public void Save(string path) {
@@ -44,14 +39,6 @@ public class CrashReport(string message, Exception exception) {
         writer.WriteLine($"Exception Message: {Exc.Message}");
         writer.WriteLine($"Exception StackTrace: {Exc.StackTrace}");
         writer.WriteLine($"Exception Source: {Exc.Source}");
-
-        if (Exc.HelpLink != null) {
-            writer.WriteLine($"Help Link: {Exc.HelpLink}");
-        }
-        else {
-            writer.WriteLine("The exception does not have a help link.");
-        }
-
         writer.WriteLine("---- END CRASH REPORT ----");
     }
 }
