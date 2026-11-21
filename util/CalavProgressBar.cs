@@ -19,15 +19,15 @@ public sealed class CalavProgressColumn : ProgressColumn {
             bar = ">" + new string('.', width - 1);
         }
         else if (filled >= width) {
-            bar = new string('=', width);
+            bar = new string('-', width);
         }
         else {
             bar =
-                new string('=', filled) +
+                new string('-', filled) +
                 ">" +
-                new string('.', width - filled - 1);
+                new string('_', width - filled - 1);
         }
-
+        
         return new Markup(
             $"([green]{bar}[/])");
     }

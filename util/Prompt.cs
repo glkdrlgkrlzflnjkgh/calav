@@ -4,7 +4,7 @@ namespace CalavScanner.utils;
 
 public class Prompt {
     string Question;
-    public Prompt(string question = "Are You Sure?", Markup.) {
+    public Prompt(string question = "Are You Sure?") {
         Question = question;
     }
     /// <summary>

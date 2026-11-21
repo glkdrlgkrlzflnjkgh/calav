@@ -3,18 +3,8 @@ using Spectre.Console;
 
 namespace CalavHashScanner.utils;
 
-public class Logging {
+public partial class Logging {
     string File;
-
-    public enum LogLevel {
-        INFO,
-        WARNING,
-        ERROR,
-        EXCEPTION,
-        FATAL,
-        DEBUG,
-
-    };
 
     public Logging(string file) {
         File = file;

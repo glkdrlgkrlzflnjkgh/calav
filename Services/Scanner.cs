@@ -23,7 +23,7 @@ public static class Scanner {
             files = [];
 
             AnsiConsole.Status()
-                .Spinner(Spinner.Known.SimpleDotsScrolling)
+                .Spinner(spinner: Spinner.Known.Circle)
                 .Start("Enumerating files...", ctx => {
                     int count = 0;
 
@@ -66,13 +66,14 @@ public static class Scanner {
             }
         }
         object lockObj = new();
+        object uiLockObj = new();
         List<string> threatPaths = [];
         AnsiConsole.MarkupLine($"Using [blue]{maxParallel}[/] threads!");
         AnsiConsole.Progress()
             .AutoClear(true)
             .Columns(
                         new PercentageColumn(),
-                        new SpinnerColumn(Spinner.Known.SimpleDotsScrolling),
+                        new SpinnerColumn(Spinner.Known.Dots),
                         new CalavProgressColumn(),
                         new TaskDescriptionColumn()
                 )
@@ -100,7 +101,7 @@ public static class Scanner {
                             int done = Interlocked.Increment(ref processed);
                             task.Increment(1);
                             if (done % 5 == 0) {
-                                lock (lockObj) {
+                                lock (uiLockObj) {
                                     task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
                                 }
                             }
