@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Spectre.Console;
 using CalavHashScanner.Util;
+using System.Data;
 
 namespace CalavHashScanner.Services;
 
@@ -23,7 +24,7 @@ public static class CacheManager
             string hash = HashUtils.ComputeSha256String(text);
             File.WriteAllText(cacheHashPath, hash, Encoding.UTF8);
 
-            AnsiConsole.MarkupLine("[green]Initial cache created.[/]");
+            AnsiConsole.MarkupLine("[green]Initial cache created![/]");
             return;
         }
 
@@ -52,7 +53,7 @@ public static class CacheManager
 
             File.WriteAllText(cacheListPath, remoteText, Encoding.UTF8);
             File.WriteAllText(cacheHashPath, remoteHash, Encoding.UTF8);
-            AnsiConsole.MarkupLine("[green]Cache updated.[/]");
+            AnsiConsole.MarkupLine("[green]Cache updated![/]");
         }
         else
         {
@@ -76,8 +77,12 @@ public static class CacheManager
 
             if (line.Length == 64) // SHA256 hex length
                 set.Add(line);
-            else
-                AnsiConsole.MarkupLine($"[yellow]Warning: Ignoring malformed line in hash list:[/] {line}");
+            else 
+            {
+                AnsiConsole.MarkupLine($"[red]Error! Malformed line in cache detected! [/] {line}");
+                throw new SyntaxErrorException();
+            }
+
         }
         Start.Stop();
         long elapsedMs = Start.ElapsedMilliseconds;
