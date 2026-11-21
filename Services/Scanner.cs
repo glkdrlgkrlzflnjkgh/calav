@@ -100,10 +100,8 @@ public static class Scanner {
                         finally {
                             int done = Interlocked.Increment(ref processed);
                             task.Increment(1);
-                            if (done % 5 == 0) {
-                                lock (uiLockObj) {
-                                    task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
-                                }
+                            lock (uiLockObj) {
+                                task.Description = $"Scanning - ({processed}/{total}) - {Markup.Escape(Path.GetFileName(file))}";
                             }
                         }
                     });
